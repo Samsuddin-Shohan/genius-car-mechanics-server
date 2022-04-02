@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -17,15 +17,30 @@ const client = new MongoClient(uri);
 async function run() {
     try {
       await client.connect();
-      const database = client.db("mydb");
-      const mechanicCollection = database.collection("mechanics");
+      const database = client.db("car_mechanics");
+      const serviceCollection = database.collection("services");
       // create a document to insert
-      const doc = {
-        title: "Record of a Shriveled Datum",
-        content: "No bytes, no problem. Just insert a document, in MongoDB",
-      }
-    //   const result = await haiku.insertOne(doc);
-     // console.log(`A document was inserted with the _id: ${result.insertedId}`);
+      app.get('/services',async(req,res)=>{
+          const cursor = serviceCollection.find({});
+          const services = await cursor.toArray();
+         // console.log(services);
+          res.send(services);
+      })
+      app.get('/service/:id',async(req,res)=>{
+          const id = req.params.id;
+          const query = {_id:ObjectId(id)};
+          const service = await serviceCollection.findOne(query);
+          res.json(service);
+      })
+      app.post('/services',async(req,res)=>{
+          const service = req.body;
+       
+         const result = await serviceCollection.insertOne(service);
+          console.log(`A document was inserted with the _id: ${result.insertedId}`);
+            res.json(result);
+      })
+     
+   
     } finally {
       //await client.close();
     }
