@@ -1,6 +1,7 @@
 const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
 const cors = require("cors");
+const res = require("express/lib/response");
 require("dotenv").config();
 
 const PORT = process.env.PORT || 5000;
@@ -20,6 +21,9 @@ async function run() {
     const database = client.db("car_mechanics");
     const serviceCollection = database.collection("services");
     // create a document to insert
+    app.get("/", async (req, res) => {
+      res.send("hello");
+    });
     app.get("/services", async (req, res) => {
       const cursor = serviceCollection.find({});
       const services = await cursor.toArray();
